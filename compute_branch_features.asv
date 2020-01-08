@@ -25,19 +25,14 @@ function [max_br_len, avg_br_len, num_br, bend] = compute_branch_features(skel, 
     %axis
     %note: mult m by -1 because y coords are technically negative 
     m = -(end2(2) - end1(2))/(end2(1) - end1(1));
-    if m == -Inf
-        m = Inf;
-    end
-    endpoint_angle = atan(m)*180 / pi;
+    angle = atan(m)*180 / pi;
     %get angle of the major axis of the nucleus
     props = regionprops(nuclei_im, 'Orientation', 'Centroid');
-    %to avoid dealing with signs, add 90 to both angles
-    endpoint_angle = endpoint_angle + 90;
-    major_axis_angle = props.Orientation + 90;
-    difference = max(endpoint_angle, major_axis_angle) - ...
-        min(endpoint_angle, major_axis_angle)
-    %SIGNS OF ANGLES NOT ALWAYS LINING UP!! check when difference is very
-    %high
+    
+    if(sign(angle) ~= sign(props.Orientation))
+        figure; imshow(skel);
+    end
+	
 	bend = 0;
 	
     %get number of branches by setting junctions = 0, then running

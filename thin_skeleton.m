@@ -3,6 +3,6 @@
 %	way to do this
 function [thinned_skeleton] = thin_skeleton(skeleton)
 	thinned_skeleton = bwmorph(skeleton, 'thin');
-	%remove connected components with size < 8
-	%thinned_skeleton = bwareaopen(thinned_skeleton, 8);
+	%remove connected components with size < 6
+	thinned_skeleton = bwareaopen(thinned_skeleton, 6);
 end
