@@ -38,39 +38,19 @@ for i = 1:size(bw_imds.Files, 1)
 	%compute skeleton endpoints 
 	[end_y,end_x] = ind2sub(size(skel), find(bwmorph(skel, 'endpoints')));
 	endpoints = [end_x,end_y];
-	%compute skeleton branch features 
-	[max_br_len, avg_br_len, num_br, bend] = ...
-		compute_branch_features(skel, intersect_pts, endpoints, skel_cc, nucleus);
-	continue;
-	%compute symmetry score for skeleton points
+    
+    %compute symmetry score for skeleton points
 	k = 4;									%smaller k, since we're dealing with small nuclei
 	%remember: channel 1 = ribbon, 2 = taper, 3 = separation 
 	skel_scores = compute_symmetry_for_sk_pts(dists, skel, k, skel_cc);
-
-%feature vector 1, not very succesful 
-% 	%grab the top N highest scoring points, thats the feature vector 
-% 	%	first, trying ribbon 
-%     
-% 	ribbon_score = reshape(skel_scores(:,:,1), [1,size(skel_scores,1)*size(skel_scores,2)]);
-% 	taper_score = reshape(skel_scores(:,:,2), [1,size(skel_scores,1)*size(skel_scores,2)]);
-% 	sep_score = reshape(skel_scores(:,:,3), [1,size(skel_scores,1)*size(skel_scores,2)]);
-% 	%note, if there aren'r N scores, they're auto padded with 0's
-% 	ribbon_feat = maxk(ribbon_score, N);
-% 	taper_feat = maxk(taper_score, N);
-% 	sep_feat = maxk(sep_score, N);
-% 	
-% 	ribbon_features = [ribbon_features ; ribbon_feat];		%add to feature matrix
-% 	taper_features = [taper_features; taper_feat];
-% 	separation_features = [separation_features ; sep_feat];
-% 	combined_features = [combined_features; ribbon_feat taper_feat sep_feat];
-% 	ribbon_and_taper_features = [ribbon_and_taper_features ; ribbon_feat taper_feat];
-% 	temp = [ribbon_feat ; taper_feat ; sep_feat];
-% 	average_combined_features = [average_combined_features ; mean(temp)];
     
+	%compute skeleton branch features (without any DN stuff) 
+	[max_br_len, avg_br_len, num_br, bend] = ...
+		compute_branch_features(skel, skel_scores, intersect_pts, endpoints, skel_cc, nucleus);
+	continue;
     
-%feature vector 2
+    %compute rnn features on the scores
     
-
 	labels = [labels, bw_imds.Labels(i)];			%add label to label list
 	filenames = [filenames, bw_imds.Files{i}];
 end

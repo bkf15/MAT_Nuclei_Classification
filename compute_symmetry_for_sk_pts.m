@@ -65,6 +65,8 @@ function [scores] = compute_symmetry_for_sk_pts(dists, skeleton, k, CC)
 			end
 			skeleton_separation(start_row, start_col) = sep_score;
 		end
-	end
+    end 
 	scores = cat(3, skeleton_r_symmetry, skeleton_t_symmetry, skeleton_separation);
+    %remove nans, which occur when numerical gradient = 0 
+    scores(isnan(scores)) = 0;
 end

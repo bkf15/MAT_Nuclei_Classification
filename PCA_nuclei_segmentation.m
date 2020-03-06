@@ -1,5 +1,13 @@
-function [nuclei_boundaries] = PCA_segmentation(slide_im)
-	%RGB_Im = imread([d f(ii).name]);
+%credit om 
+function [nuclei_boundaries] = PCA_segmentation(slide_im, threshold, max_size)
+    %added support for argument params, if no arguments passed use defualts
+    %(note, defaults are optimized for UPMC dataset)
+    if nargin == 1
+        threshold = -100;
+        max_size = 150;
+    end
+
+    %RGB_Im = imread([d f(ii).name]);
     %disp(f(ii).name);
 	RGB_Im = slide_im;
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -31,7 +39,7 @@ function [nuclei_boundaries] = PCA_segmentation(slide_im)
 
 %%% play with this threshold to get nuclei
     %U3(find(U3>-75))=0;
-	U3(U3 > -100) = 0;
+	U3(U3 > threshold) = 0;
 	U3 = U3 .* -1;
 	%threshold to binary image
 	bin_U3 = im2bw(U3, 0.5);
@@ -49,7 +57,7 @@ function [nuclei_boundaries] = PCA_segmentation(slide_im)
 	%probably not actually nuclei and should be removed 
 	CC = bwconncomp(nuclei_boundaries);
 	for i = 1:CC.NumObjects
-		if size(CC.PixelIdxList{i}, 1) > 150
+		if size(CC.PixelIdxList{i}, 1) > max_size
 			nuclei_boundaries(CC.PixelIdxList{i}) = 0;
 		end
 	end
