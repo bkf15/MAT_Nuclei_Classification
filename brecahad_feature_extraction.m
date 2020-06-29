@@ -134,8 +134,7 @@ end
 %fraction ~0.25, still around 4509 samples 
 disp(strcat('Fraction of ground truth nuclei caught: ', num2str(caught_nuclei / (missed_nuclei+caught_nuclei))));
 
-
-feat_data = struct('features', {}, 'label', {}, 'boundary', {}, 'skel_scores', {}, 'morph_feats', {}, 'color_im', {});
+feat_data = struct('features', {}, 'label', {}, 'boundary', {}, 'skel_scores', {}, 'morph_feats', {}, 'color_im', {}, 'graph', {});
 num_invalid_skeletons = 0;
 invalid_inds = [];
 %now, compute skeletons and scores for all the data samples
@@ -167,6 +166,9 @@ for i = 1:size(data, 2)
 	%remember: channel 1 = ribbon, 2 = taper, 3 = separation 
 	skel_scores = compute_symmetry_for_sk_pts(dists, skel, k, skel_cc);
     
+    %generate the graph of the skeleton
+    graph = generate_skel_graph(skel_scores, skel_cc);
+    
     %compute skeleton branch features (without any DN stuff) 
 	feat = compute_branch_features(skel, skel_scores, intersect_pts, ...
                                     endpoints, skel_cc, data(i).crop);
@@ -176,7 +178,7 @@ for i = 1:size(data, 2)
     
     feat_data(end+1) = struct('features', feat, 'label', data(i).label, ...
         'boundary', data(i).crop, 'skel_scores', skel_scores, ...
-        'morph_feats', morph_feats, 'color_im', data(i).color_im);
+        'morph_feats', morph_feats, 'color_im', data(i).color_im, 'graph', graph);
 end
 fprintf('Num invalid skeletons: %d', num_invalid_skeletons);
 
